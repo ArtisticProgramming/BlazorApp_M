@@ -1,0 +1,61 @@
+﻿@page "/mostafa"
+@page "/mostafa/{text?}"
+@inject ILogger<Mostafa> _logger;
+@rendermode InteractiveWebAssembly
+@inject IJSRuntime jsRunTime
+@inject HttpClient httpClient
+@* <SurveyPrompt Title="@Text"></SurveyPrompt> *@
+
+<Mohsen Text="محسن"></Mohsen>
+<button @onclick="sayHello">Hello</button>
+<h1>@moi</h1>
+@foreach (var item in Result)
+{
+    <p>@item.Title</p>
+}
+@code {
+    private string moi = "hello";
+
+    [Parameter] public string? Text { get; set; }
+    public Post[] Result = new Post[] { };
+
+    [Parameter] public string? OnAfterRendertxt { get; set; }
+    [Parameter] public string? OnInitializedtxt { get; set; }
+    [Parameter] public string? OnParametersSettxt { get; set; }
+
+    private async void sayHello(MouseEventArgs e)
+    {
+        Result =  await httpClient.GetFromJsonAsync<Post[]>("https://jsonplaceholder.typicode.com/posts");
+
+        moi = e.ScreenX.ToString()+","+e.ScreenY.ToString();
+    }
+
+    protected async override void OnInitialized()
+    {
+        await jsRunTime.InvokeVoidAsync("alert", "HELLLLLLLO");
+        _logger.LogInformation("1 OnInitializedtxt called");
+    }
+
+    protected override void OnParametersSet()
+    {
+        _logger.LogInformation("2 OnParametersSet called");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+       
+        _logger.LogInformation("3 OnAfterRender called");
+    }
+
+
+}
+@code {
+    public class Post
+    {
+        public int UserId { get; set; }
+        public long Id { get; set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
+    }
+
+}
